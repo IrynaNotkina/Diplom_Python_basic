@@ -64,25 +64,6 @@ class Person:
             else:
                 return today.year - birth_date.year
 
-    @classmethod
-    def create_person(cls):
-        first_name = input("Введіть ім'я: ")
-        last_name = input("Введіть прізвище (або натисніть Enter, якщо прізвище відсутнє): ")
-        middle_name = input("Введіть по-батькові (або натисніть Enter, якщо по-батькові відсутнє): ")
-        birth_date = input("Введіть дату народження (у форматі дд.мм.рррр): ")
-        while not cls.date_format(cls.check_date_format(birth_date)):
-            print("Некоректна дата. Будь ласка, введіть дату у коректному форматі.")
-            birth_date = input("Введіть дату народження (у форматі дд.мм.рррр): ")
-        death_date = input("Введіть дату смерті (або натисніть Enter, якщо дата смерті відсутня): ")
-        while death_date and not cls.date_format(cls.check_date_format(death_date)):
-            print("Некоректна дата. Будь ласка, введіть дату у коректному форматі або натисніть Enter.")
-            death_date = input("Введіть дату смерті (або натисніть Enter, якщо дата смерті відсутня): ")
-        gender = input("Введіть стать (m/f): ").lower()
-        while gender not in ['m', 'f']:
-            print("Некоректна стать. Будь ласка, введіть 'm' або 'f'.")
-            gender = input("Введіть стать (m/f): ").lower()
-
-        return cls(first_name, last_name, middle_name, birth_date, death_date, gender)
 
 
 p1 = Person('Tom', '10.04/1981', 'x', 'Junior', "SmidtJohn", '01/01,2030')
