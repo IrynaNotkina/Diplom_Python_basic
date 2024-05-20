@@ -7,7 +7,7 @@ class Person:
     PEOPLE_BASE = []
     PEOPLE_AMOUNT = 0
 
-    def __init__(self, first_name, birth_date, gender, last_name='', middle_name='', death_date=None):
+    def __init__(self, first_name, birth_date, gender, last_name=None, middle_name=None, death_date=None):
         self.first_name = first_name
         self.last_name = last_name
         self.middle_name = middle_name
@@ -38,26 +38,19 @@ class Person:
 
     def calc_age(self):
         try:
-            if self.birth_date:
-                birth_date = format_date(self.birth_date)
-                if self.death_date:
-                    death_date = format_date(self.death_date)
-                    if death_date and birth_date:
-                        if (death_date.month, death_date.day) < (birth_date.month, birth_date.day):
-                            return death_date.year - birth_date.year - 1
-                        else:
-                            return death_date.year - birth_date.year
-                    else:
-                        return None
-                else:
-                    today = datetime.now().date()
-                    if birth_date:
-                        if (today.month, today.day) < (birth_date.month, birth_date.day):
-                            return today.year - birth_date.year - 1
-                        else:
-                            return today.year - birth_date.year
-                    else:
-                        return None
+            if not self.birth_date:
+                return None
+            birth_date = format_date(self.birth_date)
+            if self.death_date:
+                end_date = format_date(self.death_date)
+            else:
+                end_date = datetime.now().date()
+            if not birth_date or not end_date:
+                return None
+            age = end_date.year - birth_date.year
+            if (end_date.month, end_date.day) < (birth_date.month, birth_date.day):
+                age -= 1
+            return age
         except AttributeError:
             return 'INCORRECT DATE FORMAT'
 
@@ -92,9 +85,11 @@ class Person:
         request = input('Type request for search: ')
         found = False
         for item in cls.PEOPLE_BASE:
-            if (request.lower() in item.first_name.lower() or
-                    request.lower() in item.last_name.lower() or
-                    request.lower() in item.middle_name.lower()):
+            first_name_matches = request in (item.first_name or "").lower()
+            last_name_matches = request in (item.last_name or "").lower()
+            middle_name_matches = request in (item.middle_name or "").lower()
+
+            if first_name_matches or last_name_matches or middle_name_matches:
                 found = True
                 print(f"{item.number}: {item}")
         if not found:
@@ -121,8 +116,8 @@ class Person:
                 row_data = [
                     index,
                     item.first_name, item.last_name, item.middle_name,
-                    item.birth_date, item.gender,
-                    item.death_date if item.death_date else None,
+                    format_date_for_excel(item.birth_date), item.gender,
+                    format_date_for_excel(item.death_date) if item.death_date else None,
                     item.age
                 ]
                 sheet.append(row_data)
@@ -155,6 +150,8 @@ class Person:
 
 def format_date(dates):
     try:
+        if isinstance(dates, datetime):
+            return dates.date()
         if isinstance(dates, date):
             return dates
         delimiters = ['/', '.', ',', ' ', '-']
@@ -176,4 +173,12 @@ def format_date(dates):
                 return date
     except Exception as e:
         return f"Error: {e}"
+
+
+def format_date_for_excel(date_obj):
+    if not date_obj:
+        return None
+    if date_obj.year < 1900:
+        return f"{date_obj.day:02d}.{date_obj.month:02d}.{date_obj.year:04d}"
+    return date_obj
 

@@ -7,11 +7,13 @@ def selection_safe():
                               '. Save data to the new file - type (N): ').upper()
     if select_excel_file == 'N':
         excel_file_name1 = input('Write new file name: ').upper()
+        if not excel_file_name1.endswith('.xlsx'):
+            excel_file_name1 += '.xlsx'
     else:
         excel_file_name1 = 'PEOPLE_MAIN_DATABASE'
 
-    Person.save_to_excel(f'{excel_file_name1}.xlsx')
-    print(f'The data has been appended to the Excel file: {excel_file_name1}.xlsx')
+    Person.save_to_excel(f'{excel_file_name1}')
+    print(f'The data has been appended to the Excel file: {excel_file_name1}')
 
 
 while True:
@@ -44,7 +46,10 @@ while True:
             time.sleep(1)
 
     elif select_action == 'E':
-        selection_safe()
+        if Person.PEOPLE_BASE:
+            selection_safe()
+        else:
+            print('You have no data to save')
 
     elif select_action == 'T':
         print('Currently amount of entries in the PEOPLE BASE: ', len(Person.PEOPLE_BASE))
